@@ -4,14 +4,24 @@
 typedef struct structura{
     char name[50];
     char phone[50];
-    char acc[50];//case of forgetting passord
+    char sec[2][100];//case of forgetting passord 0->fv pet 1->mother's maiden name
     char password[50];
     float balance;
 }S;
+int valid(char s[20])
+{
+    int k;
+    if(strlen(s)!=10||!(s[0]=='0' && s[1]=='7'))
+        return 0;
+    for(int i=2;i<10;i++)
+        if(!(s[i]>='0' && s[i]<='9'))
+            return 0;
+    return 1;
+}
 int main()
 {
     S nw,r;
-    char phone[50],password[50],acc[50],name[50];
+    char phone[50],password[50],sec[2][100],name[50];
     FILE *fw,*fr;
     int opt;
     float w,cash;
@@ -24,23 +34,32 @@ int main()
             printf("What is your name?\n");
             scanf("%s",nw.name);
             printf("Please let us know your phone number!\n");
-            scanf("%s",nw.phone);
-            fr=fopen(nw.phone,"rb");
-                if(fr!=NULL)
+            do{
+                scanf("%s",nw.phone);
+                if(valid(nw.phone)==0)
+                    printf("Please insert a correct phone number!\n");
+                else
+                    break;
+            }while(1);
+                if(fopen(nw.phone,"rb")!=NULL)
                 {
                     printf("This phone number is already associated with an existing account!\n");
                     exit(0);
                 }
-            printf("What is your account number?\n");
-            scanf("%s",nw.acc);
+            
             printf("Please write down your new password!\n");
             scanf("%s",nw.password);
+            printf("We are going to ask you a few questions,just in case you forget your password\n\n");
+            
+            printf("What is the name of your favorite pet?\n");
+            scanf("%s",nw.sec[0]);
+            printf("What is your mother's maiden name?\n");
+            scanf("%s",nw.sec[1]);
             nw.balance=0;
             fw=fopen(nw.phone,"wb");
             fwrite(&nw,sizeof(nw),1,fw);
             if(fwrite != 0)
 			    printf("Succesfully registered");
-			fclose(fr);
 			fclose(fw);
         }
     else if(opt==2)
@@ -58,6 +77,7 @@ int main()
                             fread(&r,sizeof(S),1,fr);
                             if(strcmp(password,r.password)==0)
                             {    
+                                system("clear");
                                 printf("Welcome %s !\n",r.name);
                                 do{
                                     printf("If you want to exit press 0!\n");
@@ -169,12 +189,14 @@ int main()
                             else
                             {
                                 fread(&r,sizeof(S),1,fr);
-                                printf("We will change your password if you answer fair at this questions!\n\n");
-                                printf("Please let us know what is your account number.\n ");
-                                scanf("%s",acc);
-                                printf("Please let us know your name.\n");
-                                scanf("%s",name);
-                                if(strcmp(r.acc,acc)==0 && strcmp(r.name,name)==0)
+                                printf("We will let you change your password if you answer these security questions correctly.\n\n");
+                                printf("What is the name of your favorite pet?\n");
+                                scanf("%s",sec[0]);
+                                printf("What is your mother's maiden name?\n");
+                                scanf("%s",sec[1]);
+                                
+                            
+                                if(strcmp(r.sec[0],sec[0])==0 && strcmp(r.sec[1],sec[1])==0)
                                     {
                                         printf("Welcome %s,please write down your new password!\n",r.name);
                                         fclose(fr);
@@ -189,6 +211,3 @@ int main()
                 else printf("You must choose one valid option!\n");
     return 0;
 }
-
-
-
